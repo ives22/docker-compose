@@ -1,0 +1,33 @@
+version: '3'
+services:
+  pushgateway:
+    container_name: pushgateway
+    image: prom/pushgateway
+    network_mode: "host"
+    restart: always
+
+  prometheus:
+    container_name: prometheus
+    image: registry.cn-hangzhou.aliyuncs.com/google_containers/prometheus
+    network_mode: "host"
+    restart: always
+    volumes:
+    - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
+
+  alertmanager:
+    container_name: alertmanager
+    image: prom/alertmanager:v0.19.0
+    network_mode: "host"
+    restart: always
+    volumes:
+    - ./alertmanager/alertmanager.yaml:/etc/alertmanager/alertmanager.yaml
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:6.7.3
+    network_mode: "host"
+    restart: always
+    volumes:
+    - ./data/grafana:/var/lib/grafana
+    environment:
+    - GF_SECURITY_ADMIN_PASSWORD=admin@123
