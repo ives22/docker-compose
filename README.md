@@ -4,16 +4,24 @@
 
 ```shell
 # cat prometheus/prometheus.yaml 
-      - targets: ['10.10.10.21:9090']
-      - targets: ["10.10.10.21:9093"]
-      - targets: ['10.10.10.21:9091']
+scrape_configs:
+  - job_name: "prometheus-gather"
+    static_configs:
+      - targets:
+        - 192.168.3.97:9090
+        - 192.168.3.97:9091
+        - 192.168.3.97:3000
+
+#说明：
+9090:prometheus
+9090:pushgateway
+3000:grafana
 ```
 
-## 2 创建grafana数据目录
+## 2 执行init脚本，添加grafana数据目录及修改权限
 
 ```
-mkdir ./data/grafana -p
-chown 472:472 ./data/grafana
+bash ./init.sh
 ```
 
 
@@ -41,6 +49,8 @@ Alertmanager: http://localhost:9093
 ## 4 测试数据
 
 ```
-echo "some_metric 3.14" | curl --data-binary @- http://10.10.10.21:9091/metrics/job/some_job
+echo "some_metric 3.14" | curl --data-binary @- http://localhost:9091/metrics/job/some_job
+
+#登陆pushgateway进行查看会有一条数据 job="some_job"
 ```
 

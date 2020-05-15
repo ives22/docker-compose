@@ -1,0 +1,53 @@
+#全局配置
+global:
+  resolve_timeout: 5m  #超时,默认5min
+  smtp_smarthost: smtp.exmail.qq.com:465 #邮箱smtp服务地址
+  smtp_from: ryb.monitor@yottacloud.cn  #发邮件的邮箱
+  smtp_auth_username: ryb.monitor@yottacloud.cn #发邮件的邮箱用户名
+  smtp_auth_password: eqCh3rVGfWqpk6Mp #发邮件的邮箱密码(授权码)
+  smtp_require_tls: false
+
+#模板
+templates:
+  - '/etc/alertmanager/template/*.tmpl'
+
+#路由
+route:
+  group_by: ['alertname']  #报警分组依据
+  group_wait: 10s  #组等待时间
+  group_interval: 10s  #发送前等待时间
+  repeat_interval: 5m  #重复周期
+  receiver: 'email'  #使用email告警
+  #receiver: 'wechat'   #使用微信告警
+  #receiver: 'email.wechat'  #同时使用email告警和微信告警
+
+#警报接受者
+receivers:
+- name: 'email'  #警报名称(对应路由中的receiver)
+  email_configs:
+  - to: 'yanjie.li@yottacloud.cn,381347268@qq.com'  #接收警报的email
+    html: '{{ template "email.to.html" . }}'  #模板
+
+- name: "wechat"
+  wechat_configs:
+  - send_resolved: true  #是否恢复后通知
+    api_secret: 'xxxx'  #企业微信自定义应用的秘钥
+    agent_id: 'xxxx'  #企业微信自定义应用的ID
+    corp_id: 'xxxx'  #企业账户唯一ID
+    to_party: 'xxxx'  #需要发送的组ID
+    to_user: "@all"  #企业微信用户ID，@all表示所有
+    message: '{{ template "wechat.html" . }}'  #模板
+
+- name: "email.wechat" #同时发送邮件和微信
+  email_configs:
+  - to: 'xxx@qq.com'
+    html: '{{ template "email.to.html" . }}'
+  wechat_configs:
+  - send_resolved: true
+    api_secret: 'xxxx'
+    agent_id: 'xxxx'
+    corp_id: 'xxxx'
+    to_party: 'xxxx'
+    to_user: "@all"
+    message: '{{ template "wechat.html" . }}'
+

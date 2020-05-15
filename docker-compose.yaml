@@ -1,0 +1,41 @@
+version: '3'
+services:
+  pushgateway:
+    container_name: pushgateway
+    image: registry.cn-chengdu.aliyuncs.com/ives/pushgateway:v1.2.0
+    command: --persistence.file=/pushgateway/pushgateway.data
+    network_mode: "host"
+    restart: always
+    volumes:
+      - ./data/pushgateway:/pushgateway
+
+  prometheus:
+    container_name: prometheus
+    image: registry.cn-chengdu.aliyuncs.com/ives/prometheus:v2.18.1
+    command: --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --storage.tsdb.retention=60d
+    user: 0:0
+    network_mode: "host"
+    restart: always
+    volumes:
+    - ./prometheus:/etc/prometheus
+    - ./data/prometheus:/prometheus
+    - /etc/localtime:/etc/localtime
+
+  alertmanager:
+    container_name: alertmanager
+    image: registry.cn-chengdu.aliyuncs.com/ives/alertmanager:v0.20.0
+    command: --config.file=/etc/alertmanager/alertmanager.yml
+    network_mode: "host"
+    restart: always
+    volumes:
+    - ./alertmanager:/etc/alertmanager
+
+  grafana:
+    container_name: grafana
+    image: registry.cn-chengdu.aliyuncs.com/ives/grafana:v6.7.3
+    network_mode: "host"
+    restart: always
+    volumes:
+    - ./data/grafana:/var/lib/grafana
+    environment:
+    - GF_SECURITY_ADMIN_PASSWORD=admin@123

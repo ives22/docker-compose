@@ -1,0 +1,33 @@
+groups: 
+  - name: first_rules
+    rules: 
+
+# 负载的告警
+      - alert: "linux load5 over 5"
+        for: 5s   #时间持续
+        expr: node_load5 > 5   # prmsql
+        labels:
+          serverity: critical   # 告警的级别
+        annotations: 
+          description: "{{ $labels.instance }}  over 5,当前值:{{ $value }}"
+          summary: "linux load5  over 5"
+
+# 判断客户端节点是否在线
+      - alert: "node explorter have down"
+        for: 5s
+        expr: up==0
+        labels:
+          serverity: critical
+        annotations:
+          description: "{{ $labels.instance }} ,当前值:{{ $value }}"
+          summary: "node explorter value equle 0,客户端掉线了"
+
+# elasyaffair 500
+      - alert: "elasyaffair 500"
+        for: 5s
+        expr: increase(easyaffair_requests_total{code="500"}[10s]) > 0
+        labels:
+          serverity: critical 
+        annotations:
+          summary: "接口报500错误"
+          description: "{{ $labels.url }} 接口报500错误"
