@@ -1,4 +1,5 @@
 # prometheus+grafana+pushgateway+alertmanager
+>通过Docker Compose在单机上面部署prometheus+grafana+pushgateway+alertmanager；里面覆盖邮件告警模板、微信告警模板等
 
 ## 1 将prometheus配置文件里面的IP改为自己节点的IP
 
@@ -24,7 +25,7 @@ scrape_configs:
 bash ./init.sh
 ```
 
-
+## 3 启动
 
 ```
 启动
@@ -35,7 +36,7 @@ docker-compose down
 
 ```
 
-## 3 访问地址
+## 4 访问地址
 
 ```
 Prometheus:   http://localhost:9090
@@ -46,7 +47,7 @@ Alertmanager: http://localhost:9093
 
 
 
-## 4 测试数据
+## 5 测试数据
 
 ```
 echo "some_metric 3.14" | curl --data-binary @- http://localhost:9091/metrics/job/some_job
