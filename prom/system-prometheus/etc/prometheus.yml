@@ -1,0 +1,36 @@
+global:
+  scrape_interval:     60s
+  evaluation_interval: 60s
+
+
+# rule
+rule_files:
+  - "/etc/prometheus/rules/node-exporter_rules.yml"
+
+# alerting
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - alertmanager:9093
+
+# prometheus storage
+remote_write:
+   - url: "http://influxdb:8086/api/v1/prom/write?db=prometheus"
+remote_read:
+   - url: "http://influxdb:8086/api/v1/prom/read?db=prometheus"
+
+scrape_configs:
+  - job_name: 'prom-stack'
+    static_configs:
+      - targets:
+        - prometheus:9090
+        - pushgateway:9091
+        - alertmanager:9093
+        - grafana:3000
+
+#  - job_name: node
+#    static_configs:
+#      - targets:
+#        - 192.168.102.133:9100
+

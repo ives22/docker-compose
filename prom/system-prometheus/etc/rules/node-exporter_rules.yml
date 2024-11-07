@@ -1,0 +1,92 @@
+groups:
+  - name: node-alert
+    rules:
+      - alert: NodeDown
+        expr: up{job="node"} == 0
+        for: 1m
+        labels:
+          status: Critical
+          instance: "{{ $labels.instance }}"
+        annotations:
+          summary: "{{$labels.instance}}: down"
+          description: "{{$labels.instance}} 主机宕机，请及时关注 "
+      
+      - alert: HighCPUUtilization
+        expr: 100-(avg(irate(node_cpu_seconds_total{job="node",mode="idle"}[5m])) by(instance)* 100) > 80
+        for: 1m
+        labels:
+          status: Warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          summary: "{{$labels.mountpoint}} 高CPU使用率"
+          description: "{{$labels.mountpoint }} CPU使用率超过80%，目前使用:{{$value}}%"
+  
+      - alert: HighMemeryUtilization
+        expr: 100 -(node_memory_MemTotal_bytes{job="node"} -node_memory_MemFree_bytes{job="node"}+node_memory_Buffers_bytes{job="node"}+node_memory_Cached_bytes{job="node"} ) / node_memory_MemTotal_bytes{job="node"} * 100> 80
+        for: 1m
+        labels:
+          status: Warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          summary: "{{$labels.mountpoint}} 内存使用率太高！"
+          description: "{{$labels.mountpoint }} 内存使用大于80%, 目前使用:{{$value}}%"
+
+      - alert: HighIOUtilization
+        expr: 100-(avg(irate(node_disk_io_time_seconds_total{job="node"}[1m])) by(instance)* 100) < 80
+        for: 1m
+        labels:
+          status: Warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          summary: "{{$labels.mountpoint}} 流入磁盘IO使用率太高！"
+          description: "{{$labels.mountpoint }} 流入磁盘IO大于80%，目前使用:{{$value}}"
+
+      - alert: HighInNetworkRate
+        expr: ((sum(rate (node_network_receive_bytes_total{job="node",device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*'}[5m])) by (instance)) / 100) > 102400
+        for: 1m
+        labels:
+          status: Warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          summary: "{{$labels.mountpoint}} 流入网络带宽太高！"
+          description: "{{$labels.mountpoint }}流入网络带宽持续5分钟高于100M. RX带宽使用率{{$value}}"
+
+      - alert: HighOutNetworkRate
+        expr: ((sum(rate (node_network_transmit_bytes_total{job="node",device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*'}[5m])) by (instance)) / 100) > 102400
+        for: 1m
+        labels:
+          status: Warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          summary: "{{$labels.mountpoint}} 流出网络带宽太高！"
+          description: "{{$labels.mountpoint }}流出网络带宽持续5分钟高于100M. RX带宽使用率{{$value}}"
+      
+      - alert: LargeTCPCount
+        expr: node_netstat_Tcp_CurrEstab > 3000
+        for: 1m
+        labels:
+          status: Warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          summary: "{{$labels.mountpoint}} TCP_ESTABLISHED太高！"
+          description: "{{$labels.mountpoint }} TCP_ESTABLISHED大于3000，目前使用:{{$value}}%"
+
+      - alert: HighDiskFSUsage
+        expr: 100-(node_filesystem_free_bytes{job="node",fstype=~"ext4|xfs"}/node_filesystem_size_bytes {job="node",fstype=~"ext4|xfs"}*100) > 80
+        for: 1m
+        labels:
+          status: Warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          summary: "{{$labels.mountpoint}} 磁盘分区使用率太高！"
+          description: "{{$labels.mountpoint }} 磁盘分区使用大于80%，当前值:{{ $value }}%)"
+
+      - alert: HighNodeTimeOffset
+        expr: abs(node_timex_offset_seconds{job="node"}) > 3
+        for: 2m
+        labels:
+          severity: Warning
+          instance: "{{ $labels.instance }}"
+        annotations:
+          summary: "instance: {{ $labels.instance }} 时间偏差过大"
+          description: "Time 节点的时间偏差超过3s, 当前值{{ $value}}"

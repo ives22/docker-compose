@@ -1,0 +1,18 @@
+version: "3"
+
+networks:
+  default:
+#    external:
+    name: prom
+
+services:
+  webhook-alert:
+    container_name: webhook-alert
+    image: vvoo/webhook-alert:${WEBHOOK_ALERT_VERSION}
+    volumes:
+      - ./etc/config.yaml:/webhook-alert/conf/config.yaml
+      - /etc/hosts:/etc/hosts:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8066:8066
+    restart: always

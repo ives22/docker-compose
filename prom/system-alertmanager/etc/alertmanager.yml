@@ -1,0 +1,64 @@
+#全局配置
+global:
+  resolve_timeout: 5m  #超时,默认5min
+#  smtp_smarthost: smtp.qq.com:465 #邮箱smtp服务地址
+#  smtp_from: 388@qq.com  #发邮件的邮箱
+#  smtp_auth_username: 68@qq.com #发邮件的邮箱用户名
+#  smtp_auth_password: ozozwbgjb #发邮件的邮箱密码(授权码)
+#  smtp_require_tls: false
+
+#模板
+templates:
+  - '/etc/alertmanager/template/*.tmpl'
+
+#路由
+route:
+  group_by: ['alertname']  #报警分组依据
+  group_wait: 10s  #当收到告警的时候，等待10秒确认时间内是否有新告警，如有则一并发送
+  group_interval: 10s  #发送前等待时间，配置中设置接收到告警后再等待20秒发送
+  repeat_interval: 5m  #重复告警周期时间，由于是测试所以设置比较短，在生产环境中一般设置为1h
+  #receiver: 'email'  #默认警报接受者
+  #receiver: 'wechat'  #默认警报接受者
+  #receiver: 'email.wechat' #同时发送邮件和企业微信应用
+  receiver: 'webhook' #webhook告警
+
+#警报接收者
+receivers:
+########## 邮件告警
+#- name: 'email'  #警报名称(对应路由中的receiver)
+#  email_configs:  #邮箱配置
+#  - send_resolved: true #是否恢复后通知
+#    to: '38@qq.com'  #接收警报的email配置，多个邮箱用“,”分隔
+#    html: '{{ template "email.html" . }}'  #模板
+
+
+########## 企业微信应用告警
+#- name: "wechat"
+#  wechat_configs:
+#  - send_resolved: true  #是否恢复后通知
+#    api_secret: 'NEtVoiQmgQBsBZ2IOrMdHG2CU9vaQnSriNY3IlspQ7I'  #企业微信自定义应用的秘钥
+#    agent_id: '1000038'  #企业微信自定义应用的ID
+#    corp_id: 'ww235ddb8355225bfa'  #企业账户唯一ID
+#    to_party: '2PURL'  #需要发送的组ID
+#    to_user: "@all"  #企业微信用户ID，@all表示所有
+#    message: '{{ template "wechat.html" . }}'  #模板
+
+
+########## 企业微信应用和邮件同时告警
+#- name: "email.wechat"
+#  email_configs:
+#  - to: 'yan,68@qq.com'
+#    html: '{{ template "email.html" . }}'
+#  wechat_configs:
+#  - send_resolved: true
+#    api_secret: 'NEtVoiQmgQBsBZ2IOrMdHG2CU9vaQnSriNY3IlspQ7I'
+#    agent_id: '1000038'
+#    corp_id: 'ww235ddb8355225bfa'
+#    to_party: '2PURL'
+#    to_user: "@all"
+#    message: '{{ template "wechat.html" . }}'
+
+- name: 'webhook'
+  webhook_configs:
+  - url: 'http://webhook-alert:8066/alert/prom'
+    send_resolved: true #是否恢复后通知

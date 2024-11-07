@@ -1,0 +1,21 @@
+version: "3"
+
+networks:
+  default:
+#    external:
+    name: prom
+
+services:
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:${GRAFANA_VERSION}
+    volumes:
+      - ./etc/grafana.ini:/etc/grafana/grafana.ini
+      - ./etc/plugins/:/var/lib/grafana/plugins/
+      - ./etc/provisioning/:/etc/grafana/provisioning/
+      - ./etc/grafana.db:/var/lib/grafana/grafana.db  
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 3000:3000
+    user: "0"
+    restart: always

@@ -1,0 +1,76 @@
+{{ define "email.html" }}
+{{- if gt (len .Alerts.Firing) 0 -}}
+{{- range $index, $alert := .Alerts -}}
+
+========== <span style=color:red;font-size:16px;font-weight:bold;> prometheus平台告警通知 </span>==========<br>
+
+<span style=font-size:14px;font-weight:bold;> 告警程序: </span>     Alertmanager <br>
+<span style=font-size:14px;font-weight:bold;> 告警类型: </span>    {{ $alert.Labels.alertname }} <br>
+<span style=font-size:14px;font-weight:bold;> 告警级别: </span>    {{ $alert.Labels.status }} <br>
+<span style=font-size:14px;font-weight:bold;> 告警状态: </span>    {{ .Status }} <br>
+<span style=font-size:14px;font-weight:bold;> 故障主机: </span>    {{ $alert.Labels.instance }} <br>
+<span style=font-size:14px;font-weight:bold;> 告警主题: </span>    {{ .Annotations.summary }} <br>
+<span style=font-size:14px;font-weight:bold;> 告警详情: </span>    {{ $alert.Annotations.message }}{{ $alert.Annotations.description}} <br>
+<span style=font-size:14px;font-weight:bold;> 主机标签: </span>    {{ range .Labels.SortedPairs  }} <br> [{{ .Name }}: {{ .Value  | html }} ]{{ end }}<br>
+<span style=font-size:14px;font-weight:bold;> 故障时间: </span>    {{ ($alert.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}<br>
+
+========== = end =  ==========<br>
+<br>
+<br>
+
+<div>
+    <div style=margin:40px>
+        <p style=font-size:18px>告警中心</p>
+        <p style=color:red;font-size:14px>
+        (这是一封自动发送的邮件，请勿回复。)
+        </p>
+    </div>
+
+
+    <div align=right style="margin:40px;border-top:solid 1px gray" id=bottomTime>
+        <p style=margin-right:20px>
+            Super Ops 运维平台
+        </p>
+        <label style=margin-right:20px>
+            {{ ($alert.StartsAt.Add 28800e9).Format "2006-01-02 " }}<br>
+        </label>
+    </div>
+</div>
+
+{{- end }}
+{{- end }}
+
+{{- if gt (len .Alerts.Resolved) 0 -}}
+{{- range $index, $alert := .Alerts -}}
+========== <span style=color:#00FF00;font-size:16px;font-weight:bold;> 告警恢复 </span>==========<br>
+<span style=font-size:14px;font-weight:bold;> 告警程序: </span>    Alertmanager <br>
+<span style=font-size:14px;font-weight:bold;> 告警主题: </span>    {{ $alert.Annotations.summary }}<br>
+<span style=font-size:14px;font-weight:bold;> 告警主机: </span>    {{ .Labels.instance }} <br>
+<span style=font-size:14px;font-weight:bold;> 告警类型: </span>    {{ .Labels.alertname }}<br>
+<span style=font-size:14px;font-weight:bold;> 告警级别: </span>    {{ $alert.Labels.status }} <br>
+<span style=font-size:14px;font-weight:bold;> 告警状态: </span>    {{   .Status }}<br>
+<span style=font-size:14px;font-weight:bold;> 告警详情: </span>    {{ $alert.Annotations.message }}{{ $alert.Annotations.description}}<br>
+<span style=font-size:14px;font-weight:bold;> 故障时间: </span>    {{ ($alert.StartsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}<br>
+<span style=font-size:14px;font-weight:bold;> 恢复时间: </span>    {{ ($alert.EndsAt.Add 28800e9).Format "2006-01-02 15:04:05" }}<br>
+{{- end }}
+========== = end =  ==========
+<br>
+<br>
+
+<div>
+    <div style=margin:40px>
+        <p style=font-size:18px>告警中心</p>
+        <p style=color:red;font-size:14px>
+        (这是一封自动发送的邮件，请勿回复。)
+        </p>
+    </div>
+
+
+    <div align=right style="margin:40px;border-top:solid 1px gray" id=bottomTime>
+        <p style=margin-right:20px>
+            Super Ops 运维平台
+        </p>
+    </div>
+</div>
+{{- end }}
+{{- end }}

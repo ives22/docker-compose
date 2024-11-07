@@ -1,0 +1,19 @@
+version: "3"
+
+networks:
+  default:
+#    external:
+    name: prom
+
+services:
+  alertmanager:
+    container_name: alertmanager
+    image: prom/alertmanager:${ALERTMANAGER_VERSION}
+    command: --config.file=/etc/alertmanager/alertmanager.yml
+    volumes:
+      - ./etc/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./template:/etc/alertmanager/template
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 9093:9093
+    restart: always

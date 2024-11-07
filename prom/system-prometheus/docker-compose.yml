@@ -1,0 +1,18 @@
+version: "3"
+
+networks:
+  default:
+#    external:
+    name: prom
+
+services:
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:${PROMETHEUS_VERSION}
+    volumes:
+      - ./etc/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./etc/rules:/etc/prometheus/rules
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 9090:9090
+    restart: always

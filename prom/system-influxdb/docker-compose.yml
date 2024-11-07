@@ -1,0 +1,19 @@
+version: "3"
+
+networks:
+  default:
+#    external:
+    name: prom
+
+services:
+  influxdb:
+    container_name: influxdb
+    image: influxdb:${INFLUXDB_VERSION}
+    volumes:
+      - ./etc/influxdb.conf:/etc/influxdb/influxdb.conf
+      - ./data:/var/lib/influxdb/data
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 8086:8086
+      - 8083:8083
+    restart: always
