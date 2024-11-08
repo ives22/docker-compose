@@ -12,6 +12,7 @@ services:
     volumes:
       - ./etc/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./etc/rules:/etc/prometheus/rules
+      - ./data:/prometheus
       - /etc/localtime:/etc/localtime:ro
     ports:
       - 9090:9090
