@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  kafka1:
+    image: bitnami/kafka:3.9.0
+    container_name: kafka1
+    ports:
+      - "9092:9092"  # 映射 Kafka Broker 端口到主机
+      - "19093:9093" # 映射 Kafka Controller 端口到主机
+    environment:
+      KAFKA_ENABLE_KRAFT: "yes"  # 启用 KRaft 模式（不依赖 Zookeeper）
+      KAFKA_CFG_NODE_ID: 1       # 当前节点的唯一 ID
+      KAFKA_CFG_PROCESS_ROLES: "controller,broker"  # 节点角色：控制器和代理
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "1@kafka1:9093,2@kafka2:9093,3@kafka3:9093"  # 控制器投票者列表
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"  # 监听器配置
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092"  # 对外暴露的 Broker 地址
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"  # 控制器监听器名称
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"  # Broker 间通信的监听器名称
+    volumes:
+      - ./kafka1-data:/bitnami/kafka  # 将数据目录挂载到当前目录下的 kafka1-data
+    networks:
+      - kafka-net
+
+  kafka2:
+    image: bitnami/kafka:3.9.0
+    container_name: kafka2
+    ports:
+      - "9094:9092"  # 映射 Kafka Broker 端口到主机
+      - "29093:9093" # 映射 Kafka Controller 端口到主机
+    environment:
+      KAFKA_ENABLE_KRAFT: "yes"
+      KAFKA_CFG_NODE_ID: 2
+      KAFKA_CFG_PROCESS_ROLES: "controller,broker"
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "1@kafka1:9093,2@kafka2:9093,3@kafka3:9093"
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9094"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+    volumes:
+      - ./kafka2-data:/bitnami/kafka  # 将数据目录挂载到当前目录下的 kafka2-data
+    networks:
+      - kafka-net
+
+  kafka3:
+    image: bitnami/kafka:3.9.0
+    container_name: kafka3
+    ports:
+      - "9096:9092"  # 映射 Kafka Broker 端口到主机
+      - "39093:9093" # 映射 Kafka Controller 端口到主机
+    environment:
+      KAFKA_ENABLE_KRAFT: "yes"
+      KAFKA_CFG_NODE_ID: 3
+      KAFKA_CFG_PROCESS_ROLES: "controller,broker"
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "1@kafka1:9093,2@kafka2:9093,3@kafka3:9093"
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9096"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+    volumes:
+      - ./kafka3-data:/bitnami/kafka  # 将数据目录挂载到当前目录下的 kafka3-data
+    networks:
+      - kafka-net
+
+networks:
+  kafka-net:
+    name: kafka-net 
+    driver: bridge

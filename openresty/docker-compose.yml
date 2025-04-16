@@ -1,0 +1,13 @@
+
+services:
+  openresty:
+    container_name: openresty
+    image: openresty/openresty:alpine
+    volumes:
+      - $PWD/conf.d:/etc/nginx/conf.d
+      - $PWD/conf:/usr/local/openresty/nginx/conf
+      - $PWD/html:/usr/local/openresty/nginx/html
+      - $PWD/lua:/usr/local/openresty/nginx/lua
+    ports:
+      - 8088:80
+
