@@ -1,0 +1,18 @@
+services:
+  Etcd:
+    image: docker.io/bitnami/etcd:3.6.0-debian-12-r1
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_NAME=etcd-node
+      - ETCD_ADVERTISE_CLIENT_URLS=https://etcd:2379
+      - ETCD_LISTEN_CLIENT_URLS=https://0.0.0.0:2379
+      - ETCD_CLIENT_CERT_AUTH=true
+      - ETCD_TRUSTED_CA_FILE=/opt/bitnami/etcd/certs/ca.crt
+      - ETCD_CERT_FILE=/opt/bitnami/etcd/certs/server.crt
+      - ETCD_KEY_FILE=/opt/bitnami/etcd/certs/server.key
+    volumes:
+      - ./certs:/opt/bitnami/etcd/certs:ro
+      - ./data:/bitnami/etcd
+    ports:
+      - 2379:2379
+      - 2380:2380
