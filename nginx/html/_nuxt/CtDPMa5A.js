@@ -1,1 +1,0 @@
-import{J as o,B as s,d as c}from"./CHmzAu7V.js";function m(){return o}function Y(r,e={}){const{locale:t}=s(),l=m();let a="full",u;return typeof e=="string"?a=e:typeof e=="object"&&(a=e.type||"full",u=e.format),c(()=>{if(a==="YM"){const f=t.value==="zh"?"YYYY年MM月":"MMMM YYYY";return l(r).locale(t.value).format(f)}return l(r).locale(t.value).format(u||"LL")})}export{Y as u};

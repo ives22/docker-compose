@@ -1,1 +1,0 @@
-import{_ as e,f as n,g as o}from"./CHmzAu7V.js";const r={},_={class:"w-10 h-10 border-4 border-zinc-200 border-t-brand-500 rounded-full animate-spin"};function c(t,s){return o(),n("div",_)}const d=Object.assign(e(r,[["render",c]]),{__name:"Loading"});export{d as _};
