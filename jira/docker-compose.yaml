@@ -1,0 +1,63 @@
+services:
+  nginx:
+    image: nginx:1.30.2
+    container_name: jira-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      - jira
+    networks:
+      - jira-network
+
+  jira-db:
+    image: mysql:8.0.22
+    container_name: jira-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} 
+      MYSQL_DATABASE: ${JIRA_DB_NAME} 
+      MYSQL_USER: ${JIRA_DB_USER} 
+      MYSQL_PASSWORD: ${JIRA_DB_PASSWORD}
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_bin
+      - --innodb-log-file-size=256M
+      - --innodb-log-buffer-size=16M
+      - --max-allowed-packet=256M
+      - --innodb-default-row-format=DYNAMIC
+      - --transaction-isolation=READ-COMMITTED
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    networks:
+      - jira-network
+
+  jira:
+    image: atlassian/jira-software:10.4.0
+    container_name: jira
+    restart: always
+    depends_on:
+      - jira-db
+    environment:
+      - JVM_MINIMUM_MEMORY=6144m
+      - JVM_MAXIMUM_MEMORY=6144m
+      - ATL_PROXY_NAME=jira.fun1888.com
+      - ATL_PROXY_PORT=443
+      - ATL_TOMCAT_SCHEME=https
+      - ATL_TOMCAT_SECURE=true
+    volumes:
+      - ./jira_data:/var/atlassian/application-data/jira
+      - ./setenv.sh:/opt/atlassian/jira/bin/setenv.sh
+      - ./mysql-connector-java-8.0.22.jar:/opt/atlassian/jira/lib/mysql-connector-java-8.0.22.jar
+      - ./atlassian-agent.jar:/opt/atlassian/jira/lib/atlassian-agent.jar
+    networks:
+      - jira-network
+
+networks:
+  jira-network:
+    driver: bridge

@@ -11,4 +11,5 @@ services:
       - ./html:/usr/share/nginx/html
     ports:
       - 80:80
-
+    extra_hosts:
+         - "host.docker.internal:host-gateway"
